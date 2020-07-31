@@ -2,7 +2,7 @@
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ko">
-<head> 
+<head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -14,26 +14,27 @@
   <!-- Theme style -->
   <link rel="stylesheet" href="/resources/dist/css/adminlte.min.css">
   <!-- Google Font: Source Sans Pro -->
-  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
 <script>
 if('${msg}' != ""){
-	alert("${msg}에 성공하였습니다.");
-	}
+	alert("${msg} 에 성공하였습니다.!");
+}
 </script>
-
 <!-- jQuery코어 -->
 <script src="/resources/plugins/jquery/jquery.min.js"></script>
-
 </head>
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
- <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+
+  <!-- Navbar -->
+  <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
       <li class="nav-item">
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
     </ul>
+
     <!-- SEARCH FORM -->
     <form class="form-inline ml-3">
       <div class="input-group input-group-sm">
@@ -45,18 +46,19 @@ if('${msg}' != ""){
         </div>
       </div>
     </form>
+
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-          <!-- Notifications Dropdown Menu -->
-            <li class="nav-item">
+      <!-- Notifications Dropdown Menu -->
+      <li class="nav-item">
         <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i
             class="fas fa-th-large"></i></a>
       </li>
     </ul>
   </nav>
-  </div>
+  <!-- /.navbar -->
   
-     <!--  Main Sidebar Container -->
+  <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <a href="/admin" class="brand-link">
@@ -73,10 +75,13 @@ if('${msg}' != ""){
           <img src="/resources/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">user02<span class="right badge badge-danger">Online</span></a>
+          <a href="#" class="d-block">${session_username} 님
+          <span class="right badge badge-danger">Online</span>
+          </a>
         </div>
       </div>
-           <!-- Sidebar Menu -->
+
+      <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item">
@@ -85,11 +90,11 @@ if('${msg}' != ""){
               <p>사용자 홈</p>
             </a>
           </li>
+          
           <li class="nav-item has-treeview menu-open">
             <a href="#" class="nav-link active">
               <i class="nav-icon fas fa-tachometer-alt"></i>
-              <p>
-                대시보드
+              <p>대시보드
                 <i class="right fas fa-angle-left"></i>
               </p>
             </a>
@@ -100,19 +105,35 @@ if('${msg}' != ""){
                   <p>회원관리</p>
                 </a>
               </li>
-              <li class="nav-item">
-                <a href="/admin/board/list" class="nav-link">
+              
+              <li class="nav-item has-treeview">
+                <a href="#" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>게시판관리</p>
+                  	<i class="right fas fa-angle-left"></i>
                 </a>
+	            <ul class="nav nav-treeview">
+		              <li class="nav-item">
+		                <a href="/admin/board/list?searchBoard=notice" class="nav-link">
+		                  <i class="far fa-circle nav-icon"></i>
+		                  <p>공지사항</p>
+		                </a>
+		              </li>
+		              <li class="nav-item">
+		                <a href="/admin/board/list?searchBoard=gallery" class="nav-link">
+		                  <i class="far fa-circle nav-icon"></i>
+		                  <p>겔러리</p>
+		                </a>
+		              </li>
+	            </ul>
               </li>
+              
             </ul>
-
+          </li>
+        
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
     </div>
     <!-- /.sidebar -->
   </aside>
-  
-  

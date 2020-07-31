@@ -27,6 +27,15 @@
 					<p class="info_pilsoo pilsoo_item">필수입력</p>
 					<ul class="app_list">
 						<li class="clear">
+							<label for="name_lbl" class="tit_lbl pilsoo_item">게시판선택</label>
+								<div class= "app_content">
+									<select name="bod_type" type="text" class="select_common" id="name_lbl" <option value="">게시판선택</option>
+				                      <option value="notice" <c:out value="${(session_bod_type eq 'notice')?('selected'):('')}" />>공지사항</option>
+				                      <option value="gallery" <c:out value="${(session_bod_type eq 'gallery')?('selected'):('')}" />>갤러리</option> required>
+		                      		</select>
+		                     	 </div>
+						</li>
+						<li class="clear">
 							<label for="name_lbl" class="tit_lbl pilsoo_item">제목</label>
 							<div class="app_content"><input name="title" type="text" class="w100p" id="name_lbl" placeholder="제목을 입력해주세요" required /></div>
 						</li>

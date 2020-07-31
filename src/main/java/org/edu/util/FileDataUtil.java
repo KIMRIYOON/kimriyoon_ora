@@ -44,7 +44,7 @@ public class FileDataUtil {
 	 */
 	@RequestMapping(value="/download", method=RequestMethod.GET)
 	@ResponseBody
-	public FileSystemResource fileDownload(@RequestParam("filename")String fileName, HttpServletResponse response) {
+	public FileSystemResource fileDownload(@RequestParam("filename") String fileName, HttpServletResponse response) {
 		File file = new File(uploadPath + "/" + fileName);
 		response.setContentType("application/download; utf-8");
 		response.setHeader("content-disposition", "attachment; filename="+fileName);

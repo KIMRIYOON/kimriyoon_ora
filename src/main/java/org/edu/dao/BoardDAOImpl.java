@@ -42,8 +42,11 @@ public class BoardDAOImpl implements IF_BoardDAO {
 		return sqlSession.selectOne(mapperQuery + ".viewBoard", bno);
 	}
 	@Override
-	public void insertAttach(String fullName) throws Exception {
-		sqlSession.insert(mapperQuery+ ".insertAttach", fullName);
+	public void insertAttach(String fullName, Integer bno) throws Exception {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("bno", bno);
+		paramMap.put("fullname", fullName);
+		sqlSession.insert(mapperQuery+ ".insertAttach", paramMap);
 		
 	}
 	@Override
@@ -69,6 +72,14 @@ public class BoardDAOImpl implements IF_BoardDAO {
 	@Override
 	public void updateViewCount(Integer bno) throws Exception {
 		sqlSession.update(mapperQuery + ".updateViewCount", bno);
+	}
+	@Override
+	public void deleteBoardReply(Integer bno) throws Exception {
+		sqlSession.delete(mapperQuery + ".deleteBoardReply", bno);
+	}
+	@Override
+	public int selectTopBno() throws Exception {
+		return sqlSession.selectOne(mapperQuery + ".selectTopBno");
 	}
 	
 	

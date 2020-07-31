@@ -164,7 +164,13 @@ public class HomeController {
 	 */
 	
 	@RequestMapping(value = "/board/list", method = RequestMethod.GET)
-	public String boardList(@ModelAttribute("pageVO") PageVO pageVO, Locale locale, Model model) throws Exception {
+	public String boardList(@ModelAttribute("pageVO") PageVO pageVO, Locale locale, Model model, HttpServletRequest request) throws Exception {
+		HttpSession session = request.getSession();
+		if(pageVO.getSearchBoard() !=null) {
+			session.setAttribute("session_bod_type", pageVO.getSearchBoard());
+		}else {
+			pageVO.setSearchBoard((String) session.getAttribute("session_bod_type"));
+		}
 		//PageVO pageVO = new PageVO();//매개변수로 받기 전 테스트용
 		if(pageVO.getPage() == null) {//초기 page변수값 지정
 			pageVO.setPage(1);//초기 page변수값지정
@@ -295,12 +301,14 @@ public class HomeController {
 		}
 		pageVO.setPerPageNum(5);//1페이지당 보여줄 게시물 수 강제지정
 		pageVO.setTotalCount(boardService.countBno(pageVO));//강제로 이볅한 값을 쿼리로 대체OK.
-		List<BoardVO> list = boardService.selectBoard(pageVO);
-		
-		//첨부파일 출력때문에 추가 Start
+		pageVO.setSearchBoard("notice");
+		List<BoardVO> listNotice = boardService.selectBoard(pageVO);
+		pageVO.setSearchBoard("gallery");
+		List<BoardVO> listGallery = boardService.selectBoard(pageVO);
+		//첨부파일 출력때문에 추가 Start -- 갤러리에서만 필요
 		List<BoardVO> boardListFiles = new ArrayList<BoardVO>();
 		int index = 0 ;
-		for(BoardVO vo:list) {
+		for(BoardVO vo:listGallery) {
 			List<String> files = boardService.selectAttach(vo.getBno());
 			String[] filenames = new String[files.size()];
 			int cnt = 0;
@@ -312,7 +320,8 @@ public class HomeController {
 		}
 		model.addAttribute("extNameArray", fileDataUtil.getExtNameArray());//첨부파일이 이미지인지 문서파일인지 구분용으로 쓰이는 jsp변수
 		// 첨부파일 출력때문에 추가 End
-		model.addAttribute("boardList", boardListFiles);	
+		model.addAttribute("boardListGallery", boardListFiles);	
+		model.addAttribute("boardListNotice", listNotice);	
 		return "home";
 	}
 	
