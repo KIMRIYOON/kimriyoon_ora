@@ -17,6 +17,7 @@ import javax.validation.Valid;
 import org.edu.service.IF_BoardService;
 import org.edu.service.IF_MemberService;
 import org.edu.util.FileDataUtil;
+import org.edu.vo.BoardTypeVO;
 import org.edu.vo.BoardVO;
 import org.edu.vo.MemberVO;
 import org.edu.vo.PageVO;
@@ -40,38 +41,106 @@ public class AdminController {
 	@Inject
 	private IF_BoardService boardService;
 	
-	@Inject 
+	@Inject
 	private IF_MemberService memberService;
 	
 	@Inject
 	private FileDataUtil fileDataUtil;
+	
+	/**
+	 * 게시판생성 Insert 입니다.
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/write", method = RequestMethod.GET)
+	public String bodTypeInsert(Locale locale, Model model) throws Exception {
 		
+		return "admin/bodtype/bodtype_insert";
+	}
+	/**
+	 * 게시판생성 Insert 입니다.
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/write", method = RequestMethod.POST)
+	public String bodTypeInsert(BoardTypeVO boardTypeVO, Locale locale, RedirectAttributes rdat) throws Exception {
+		boardService.insertBoardType(boardTypeVO);
+		rdat.addFlashAttribute("msg", "입력");
+		return "redirect:/admin/bodtype/list";
+	}
+	/**
+	 * 게시판생성 수정 입니다.
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/update", method = RequestMethod.GET)
+	public String bodTypeUpdate(@RequestParam ("bod_type") String bod_type, Locale locale, Model model) throws Exception {
+		BoardTypeVO boardTypeVO = boardService.viewBoardType(bod_type);
+		model.addAttribute("bodTypeVO", boardTypeVO);
+		// {'notice','공지사항',1}
+		return "admin/bodtype/bodtype_update";
+	}
+	/**
+	 * 게시판생성 수정 입니다.
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/update", method = RequestMethod.POST)
+	public String bodTypeUpdate(BoardTypeVO boardTypeVO, Locale locale, RedirectAttributes rdat) throws Exception {
+		boardService.updateBoardType(boardTypeVO);
+		rdat.addFlashAttribute("msg", "수정");
+		return "redirect:/admin/bodtype/list";
+	}
+	
+	/**
+	 * 게시판생성 삭제 입니다.
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/delete", method = RequestMethod.POST)
+	public String bodTypeDelete(BoardTypeVO boardTypeVO, Locale locale, RedirectAttributes rdat) throws Exception {
+		boardService.deleteBoardType(boardTypeVO.getBod_type());
+		rdat.addFlashAttribute("msg", "삭제");
+		return "redirect:/admin/bodtype/list";
+	}
+	/**
+	 * 게시판생성 리스트 입니다.
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/list", method = RequestMethod.GET)
+	public String bodTypeList(Locale locale, Model model) throws Exception {
+		List<BoardTypeVO> list = boardService.selectBoardType();
+		model.addAttribute("bodTypeList", list);
+		/* 위의 bodTypeList생성한 변수 안에는
+		[
+		 {'notiece','공지사항','1'},
+		 {'gallery','커뮤니티','2'}
+		]
+		내용이 들어가있다. */
+	
+		return "admin/bodtype/bodtype_list";
+	}
+	
 	/**
 	 * 게시물관리 리스트 입니다.
 	 * @throws Exception 
 	 */
-	
 	@RequestMapping(value = "/board/list", method = RequestMethod.GET)
 	public String boardList(@ModelAttribute("pageVO") PageVO pageVO, Locale locale, Model model, HttpServletRequest request) throws Exception {
 		//초기 메뉴를 클릭시 /admin/board/list?searchBoard=notice 데이터전송
 		HttpSession session = request.getSession();
-		if(pageVO.getSearchBoard() !=null) {
+		if(pageVO.getSearchBoard() != null) {
 			//최초 세션 만들어짐
 			session.setAttribute("session_bod_type", pageVO.getSearchBoard());
-		}else {
-			//일반링크 클릭시 /admin/board/view?page=2... 데이터 전송
-			//만들어진 세션을 사용하는 로직(아래)
+		} else {
+			//일반링크 클릭시 /admin/board/view?page=2...
+			//만들어진 세션 사용(아래)
 			pageVO.setSearchBoard((String) session.getAttribute("session_bod_type"));
 		}
-		//PageVO pageVO = new PageVO();//매개변수로 받기 전 테스트용
-		if(pageVO.getPage() == null) {//초기 page변수값 지정
-			pageVO.setPage(1);
+		//PageVO pageVO = new PageVO();//매개변수로 받기전 테스트용
+		if(pageVO.getPage() == null) {
+			pageVO.setPage(1);//초기 page변수값 지정
 		}
 		pageVO.setPerPageNum(10);//1페이지당 보여줄 게시물 수 강제지정
-		pageVO.setTotalCount(boardService.countBno(pageVO));//강제로 이볅한 값을 쿼리로 대체OK.
+		pageVO.setTotalCount(boardService.countBno(pageVO));//강제로 입력한 값을 쿼리로 대체OK.
 		List<BoardVO> list = boardService.selectBoard(pageVO);
-		//모델클래스로 jsp화면으로 boardService에서 셀렉트한 list값을 boardList라는 변수명으로 보낸다.
-		//model이라는 영역안에서 { list라는 변수를 -> boardList로 지정해서 -> jsp로 보낸다 }
+		//모델클래스로 jsp화면으로 boardService에서 셀렉트한 list값을 boardList변수명으로 보낸다.
+		//model { list -> boardList -> jsp }
 		model.addAttribute("boardList", list);
 		model.addAttribute("pageVO", pageVO);
 		return "admin/board/board_list";
@@ -81,9 +150,9 @@ public class AdminController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(value = "/board/view", method = RequestMethod.GET)
-	public String boardView(@ModelAttribute("pageVO") PageVO pageVO, @RequestParam("bno") Integer bno ,Locale locale, Model model) throws Exception {
+	public String boardView(@ModelAttribute("pageVO") PageVO pageVO, @RequestParam("bno") Integer bno,Locale locale, Model model) throws Exception {
 		BoardVO boardVO = boardService.viewBoard(bno);
-		//여기서부터 첨부파일명 때문에 추가
+		//여기서 부터 첨부파일명 때문에 추가
 		List<String> files = boardService.selectAttach(bno);
 		String[] filenames = new String[files.size()];
 		int cnt = 0;
@@ -98,6 +167,7 @@ public class AdminController {
 		model.addAttribute("pageVO", pageVO);
 		return "admin/board/board_view";
 	}
+	
 	/**
 	 * 게시물관리 > 등록 입니다.
 	 * @throws Exception 
@@ -106,18 +176,17 @@ public class AdminController {
 	public String boardWrite(Locale locale, Model model) throws Exception {
 		
 		return "admin/board/board_write";
-		
 	}
 	@RequestMapping(value = "/board/write", method = RequestMethod.POST)
-	public String boardWrite(MultipartFile file, @Valid BoardVO boardVO, Locale locale, RedirectAttributes rdat) throws Exception {
-		//System.out.println("====첨부파일 없이 저장====" + file.getOriginalFilename()
-		if(file.getOriginalFilename() == "" ) {
+	public String boardWrite(MultipartFile file,@Valid BoardVO boardVO,Locale locale, RedirectAttributes rdat) throws Exception {
+		//System.out.println("========첨부파일없이 저장===" + file.getOriginalFilename());
+		if(file.getOriginalFilename() == "") {
 			//첨부파일 없이 저장
 			boardService.insertBoard(boardVO);
 		}else {
 			String[] files = fileDataUtil.fileUpload(file);
 			boardVO.setFiles(files);
-			boardService.insertBoard(boardVO);
+			boardService.insertBoard(boardVO);			
 		}
 		rdat.addFlashAttribute("msg", "입력");
 		return "redirect:/admin/board/list";
@@ -135,29 +204,28 @@ public class AdminController {
 		return "admin/board/board_update";
 	}
 	@RequestMapping(value = "/board/update", method = RequestMethod.POST)
-	public String boardUpdate(@ModelAttribute("pageVO") PageVO pageVO, MultipartFile file, @Valid BoardVO boardVO, Locale locale, RedirectAttributes rdat) throws Exception {
-		if(file.getOriginalFilename() == "") {
+	public String boardUpdate(@ModelAttribute("pageVO") PageVO pageVO, MultipartFile file,@Valid BoardVO boardVO,Locale locale, RedirectAttributes rdat) throws Exception {
+		if(file.getOriginalFilename() == "") {//조건:첨부파일 전송 값이 없다면
 			boardService.updateBoard(boardVO);
-		}else {
-			//이전첨부파일 삭제(아래)
+		} else {
+			//기존등록된 첨부파일 삭제처리(아래)
 			List<String> delFiles = boardService.selectAttach(boardVO.getBno());
-			String[] filenames = new String[delFiles.size()];
 			for(String fileName : delFiles) {
-				//실제파일 삭제(아래)
+				//실제파일 삭제
 				File target = new File(fileDataUtil.getUploadPath(), fileName);
 				if(target.exists()) { //조건:해당경로에 파일명이 존재하면
-					target.delete(); //파일삭제
-				}
+					target.delete();  //파일삭제
+				}//End if
 			}//End for
-			//아래에서부터 신규 파일 업로드
-			String[] files = fileDataUtil.fileUpload(file);		
- 			boardVO.setFiles(files);//데이터베이스 <-> VO(get,set) <-> DAO클래스
+			//아래 신규파일 업로드
+			String[] files = fileDataUtil.fileUpload(file);//실제파일업로드후 파일명 리턴
+			boardVO.setFiles(files);//데이터베이스 <-> VO(get,set) <-> DAO클래스
 			boardService.updateBoard(boardVO);
-			
 		}//End if
+		
+		
 		rdat.addFlashAttribute("msg", "수정");
 		return "redirect:/admin/board/view?bno=" + boardVO.getBno() + "&page=" + pageVO.getPage();
-		
 	}
 	
 	/**
@@ -177,11 +245,12 @@ public class AdminController {
 			if(target.exists()) {
 				target.delete();
 			}
-		}
+		}		
 		
 		rdat.addFlashAttribute("msg", "삭제");
 		return "redirect:/admin/board/list";
 	}
+	
 	
 	/**
 	 * 회원관리 리스트 입니다.
@@ -195,8 +264,8 @@ public class AdminController {
 		pageVO.setPerPageNum(10);
 		pageVO.setTotalCount(memberService.countUserId(pageVO));
 		List<MemberVO> list = memberService.selectMember(pageVO);
-		//모델클래스로 jsp화면으로 memberService에서 셀렉트한 list값을 memberList라는 변수명으로 보낸다.
-		//model이라는 영역안에서 { list라는 변수를 -> memberList로 지정해서 -> jsp로 보낸다 }
+		//모델클래스로 jsp화면으로 memberService에서 셀렉트한 list값을 memberList변수명으로 보낸다.
+		//model { list -> memberList -> jsp }
 		model.addAttribute("memberList", list);
 		model.addAttribute("pageVO", pageVO);
 		return "admin/member/member_list";
@@ -213,6 +282,7 @@ public class AdminController {
 		model.addAttribute("memberVO", memberVO);
 		return "admin/member/member_view";
 	}
+	
 	/**
 	 * 회원관리 > 등록 입니다.
 	 * @throws Exception 
@@ -224,14 +294,14 @@ public class AdminController {
 	}
 	@RequestMapping(value = "/member/write", method = RequestMethod.POST)
 	public String memberWrite(@Valid MemberVO memberVO, Locale locale, RedirectAttributes rdat) throws Exception {
-		String new_pw = memberVO.getUser_pw();//ex)1234
-		if(new_pw !="") {
-			//스프링시큐리티 4.x BCryptPasswordEncoder 암호 사용
+		String new_pw = memberVO.getUser_pw();//예를 들면 1234
+		if(new_pw != "") {
+			//스프링 시큐리티 4.x BCryptPasswordEncoder 암호화 사용
 			BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder(10);
-			String bcryptPassword = bcryptPasswordEncoder.encode(new_pw);
-			memberVO.setUser_pw(bcryptPassword);//DB에 들어가기전에 값을 set시키는 것.
+			String bcryptPassword = bcryptPasswordEncoder.encode(new_pw);//예, 1234 -> 암호화 처리됨
+			memberVO.setUser_pw(bcryptPassword);//DB에 들어가기전 값 set시킴.
 		}
-		memberService .insertMember(memberVO);
+		memberService.insertMember(memberVO);
 		rdat.addFlashAttribute("msg", "입력");
 		return "redirect:/admin/member/list";
 	}
@@ -249,15 +319,15 @@ public class AdminController {
 	}
 	@RequestMapping(value = "/member/update", method = RequestMethod.POST)
 	public String memberUpdate(@ModelAttribute("pageVO") PageVO pageVO, MemberVO memberVO, Locale locale, RedirectAttributes rdat) throws Exception {
-		String new_pw = memberVO.getUser_pw();//ex)1234
-		if(new_pw !="") {
-			//스프링시큐리티 4.x BCryptPasswordEncoder 암호 사용
+		String new_pw = memberVO.getUser_pw();//예를 들면 1234
+		if(new_pw != "") {
+			//스프링 시큐리티 4.x BCryptPasswordEncoder 암호화 사용
 			BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder(10);
-			String bcryptPassword = bcryptPasswordEncoder.encode(new_pw);
-			memberVO.setUser_pw(bcryptPassword);//DB에 들어가기전에 값을 set시키는 것.
-		}
+			String bcryptPassword = bcryptPasswordEncoder.encode(new_pw);//예, 1234 -> 암호화 처리됨
+			memberVO.setUser_pw(bcryptPassword);//DB에 들어가기전 값 set시킴.
+		}		
 		memberService.updateMember(memberVO);
-		rdat.addFlashAttribute("msg","수정");
+		rdat.addFlashAttribute("msg", "수정");
 		return "redirect:/admin/member/view?user_id=" + memberVO.getUser_id() + "&page=" + pageVO.getPage();
 	}
 	
@@ -280,4 +350,5 @@ public class AdminController {
 		
 		return "admin/home";
 	}
+	
 }

@@ -6,10 +6,12 @@ import javax.inject.Inject;
 
 import org.edu.dao.IF_BoardDAO;
 import org.edu.dao.IF_MemberDAO;
-import org.edu.dao.IF_ReplyDAO;
+import org.edu.vo.BoardTypeVO;
 import org.edu.vo.BoardVO;
 import org.edu.vo.MemberVO;
 import org.edu.vo.PageVO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,8 +20,7 @@ public class BoardServiceImpl implements IF_BoardService {
 
 	@Inject
 	private IF_BoardDAO boardDAO;
-	
-	
+
 	@Transactional
 	@Override
 	public void insertBoard(BoardVO boardVO) throws Exception {
@@ -43,11 +44,11 @@ public class BoardServiceImpl implements IF_BoardService {
 		boardDAO.updateBoard(boardVO);
 		//첨부파일용 서비스추가
 		String[] files = boardVO.getFiles();
-		Integer bno = boardVO.getBno(); //tbl_attach테이블 수정용 변수
+		Integer bno = boardVO.getBno();//tbl_attach테이블 수정용변수
 		if(files == null) { return; }
-		boardDAO.deleteAttach(bno); //기존 첨부파일 내용을 삭제
+		boardDAO.deleteAttach(bno);//기존 첨부파일 내용을 삭제
 		for(String fileName : files) {
-			boardDAO.updateAttach(fileName, bno); //신규 첨부파일 내용 입력
+			boardDAO.updateAttach(fileName, bno);//신규 첨부파일 내용 입력
 		}
 	}
 
@@ -57,7 +58,6 @@ public class BoardServiceImpl implements IF_BoardService {
 		boardDAO.deleteBoardReply(bno);
 		boardDAO.deleteAttach(bno);
 		boardDAO.deleteBoard(bno);
-		
 	}
 
 	@Override
@@ -76,13 +76,29 @@ public class BoardServiceImpl implements IF_BoardService {
 		return boardDAO.countBno(pageVO);
 	}
 
+	@Override
+	public List<BoardTypeVO> selectBoardType() throws Exception {
+		return boardDAO.selectBoardType();
+	}
 
-	
+	@Override
+	public void deleteBoardType(String bod_type) throws Exception {
+		boardDAO.deleteBoardType(bod_type);
+	}
 
-	
-	
-	
+	@Override
+	public void updateBoardType(BoardTypeVO boardTypeVO) throws Exception {
+		boardDAO.updateBoardType(boardTypeVO);
+	}
 
-	
-	
+	@Override
+	public void insertBoardType(BoardTypeVO boardTypeVO) throws Exception {
+		boardDAO.insertBoardType(boardTypeVO);
+	}
+
+	@Override
+	public BoardTypeVO viewBoardType(String bod_type) throws Exception {
+		return boardDAO.viewBoardType(bod_type);
+	}
+
 }
