@@ -12,4 +12,5 @@ public interface IF_MemberService {
 	public void deleteMember(String user_id) throws Exception;
 	public MemberVO viewMember(String user_id) throws Exception; 
 	public int countUserId(PageVO pageVO) throws Exception;
+	public List<MemberVO> testJobMethod() throws Exception;
 }

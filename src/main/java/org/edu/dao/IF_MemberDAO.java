@@ -12,4 +12,5 @@ public interface IF_MemberDAO {
 	public void deletMember(String user_id) throws Exception;
 	public MemberVO viewMember(String user_id) throws Exception;
 	public int countUserId(PageVO pageVO) throws Exception;
+	public List<MemberVO> testJobMethod() throws Exception;
 }
